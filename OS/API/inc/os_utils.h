@@ -9,6 +9,7 @@
 #define OS_UTILS_H
 
 #include "os_defs.h"
+#include "os_pro_config.h"
 
 #define OS_UTILS_ASSERT_INT(x,info,err)\
     do{\
@@ -45,6 +46,12 @@ typedef struct task_config_t
 }TaskConfig_t;
 
 
+typedef struct os_semaphore{
+    uint8_t type; //0:binary semaphore, 1:counting semaphore
+    uint8_t id;   //semaphore id
+    void* handle; //semaphore handle
+}OSSemaphore_t;
+
 /*
 *   Create when OS is running
 */
@@ -78,5 +85,14 @@ static inline void CreateTasks(TaskConfig_t cfgs[],int task_num){
     xTaskResumeAll();
 }
 
+
+/*
+*   OS API
+*/
+void OS_TaskRegister(TaskConfig_t* cfg);
+
+void OS_GetTaskList(TaskConfig_t** list);
+
+uint8_t OS_GetTaskCount(void);
 
 #endif

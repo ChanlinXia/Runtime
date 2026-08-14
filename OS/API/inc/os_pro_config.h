@@ -1,0 +1,13 @@
+#ifndef OS_PRO_CONFIG_H
+#define OS_PRO_CONFIG_H
+
+#define OS_TASK_NUM 5
+
+typedef enum{
+    OS_PRO_CONFIG_TASK_PRINT = 0,
+    OS_PRO_CONFIG_TASK_TAP_COUNT,
+    OS_PRO_CONFIG_TASK_MAX
+}OS_PRO_CONFIG_TASK_ID;
+
+#endif
+
