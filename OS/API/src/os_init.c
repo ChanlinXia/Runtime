@@ -1,4 +1,3 @@
-
 #include "os_init.h"
 #include "os_utils.h"
 
@@ -11,88 +10,48 @@
 /*
 *   Private Declaration
 */
-// static TaskFunction_t startTask;
 static void startTask(void* pvParameters);
-
-// extern TaskConfig_t task_list[];
-static TaskHandle_t StartTaskHandle = NULL;
+static OS_TaskHandle_t StartTaskHandle = NULL;
 
 /*
-*   Private Defination 
+*   Private Definition 
 */
-
-// static TaskFunction_t startTask;
 static void startTask(void* pvParameters){
-    TaskConfig_t* task_list=NULL;
+    OS_TaskConfig_t* task_list = NULL;
     OS_GetTaskList(&task_list);
 
-    // OS_UTILS_ASSERT_INT(task_list != NULL, "task_list is NULL", 0);
+    OS_EnterCritical();   // 统一临界区
 
-    // TaskConfig_t task_list[]={
-    //     // Print Task
-    //     (TaskConfig_t){
-    //         .name = "/test/print",
-    //         .prio = 1,
-    //         .func = OSTask_Print,
-    //         .taskHandle = &PrintTaskHandle,
-    //         .param = NULL,
-    //         .stkSize = 128,
-    //     },
-    //     // Tap Count Task
-    //     // (TaskConfig_t){
-    //     //     .name = "/test/tap_count",
-    //     //     .prio = 2,
-    //     //     .func = OSTask_TapCount,
-    //     //     .taskHandle = &TapCountTaskHandle,
-    //     //     .param = NULL,
-    //     //     .stkSize = 128,
-    //     // }
-    // };
-    taskENTER_CRITICAL();
-
-    for(int i=0;i< OS_GetTaskCount();++i){
-        TaskConfig_t* cur_task = &task_list[i];
-        xTaskCreate(
-            cur_task->func,
-            cur_task->name,
-            cur_task->stkSize,
-            cur_task->param,
-            cur_task->prio,
-            cur_task->taskHandle
-            );
+    for(int i = 0; i < OS_GetTaskCount(); ++i){
+        OS_TaskConfig_t* cur_task = &task_list[i];
+        // 直接调用抽象接口创建任务
+        OS_CreateTask(cur_task);
     }
 
-    vTaskDelete(StartTaskHandle);
+    OS_TaskDelete(StartTaskHandle);   // 删除启动任务
 
-    taskEXIT_CRITICAL();
-
-    // return NULL;
+    OS_ExitCritical();    // 退出临界区
 }
-
-
 
 /*
 *   API
 */
-void OSStart(void){
-
+void OS_Start(void){
     printf("OS Start\r\n");
 
-    TaskConfig_t start_task_config = {
-        .prio = START_TASK_PRIO,
-        .stkSize = START_STK_SIZE,
-        .name = "StartTask",
-        .taskHandle = &StartTaskHandle,
+    OS_TaskConfig_t start_task_config = {
+        .func = startTask,
         .param = NULL,
-        .func = (TaskFunction_t)startTask
+        .name = "StartTask",
+        .stack_depth = START_STK_SIZE,   // 注意字段名
+        .priority = START_TASK_PRIO,     // 注意字段名
+        .task_handle = &StartTaskHandle
     };
 
-    CreateTask(&start_task_config);
-    // OS_UTILS_ASSERT(, err);
-    vTaskStartScheduler();
+    OS_CreateTask(&start_task_config);      // 也可以换成 OS_OS_CreateTask，但保留原业务接口名
+    OS_StartScheduler();                 // 统一启动调度器
 
     // printf("start the os successfully!\r\n");
 }
-
 
 

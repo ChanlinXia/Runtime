@@ -43,7 +43,8 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include "stm32f407xx.h"
+#include "stm32f405xx.h"
+// #include "os_utils.h"
 
 /******************************************************************************/
 /* Hardware description related definitions. **********************************/
@@ -427,19 +428,17 @@
  * execution on the failing line for viewing in a debugger. */
 
 /* *INDENT-OFF* */
+#include <stdio.h>
 #define configASSERT( x )         \
-    if( ( x ) == 0 )              \
-    {                             \
-        taskDISABLE_INTERRUPTS(); \
-        do{\
-            if(!(x)){\
-                printf("[FreeRTOS_ASSERT]:occured at%s:%d\r\n",,__FILE__,__LINE__);\
-                while(1){}\
-            }\
-        }while(0)\
-        for( ; ; )                \
-        ;                         \
-    }
+    do{\
+        if( ( x ) == 0 )              \
+        {                             \
+            taskDISABLE_INTERRUPTS(); \
+            printf("[FreeRTOS_Config_ASSERT]. Occured at %s,%d\r\n",__FILE__,__LINE__);\
+            for( ; ; )                \
+            ;                         \
+        }  \
+    }while(0)
 /* *INDENT-ON* */
 
 /******************************************************************************/

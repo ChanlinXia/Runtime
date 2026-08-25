@@ -8,6 +8,6 @@
 #define OS_INIT_H
 
 
-void OSStart(void);
+void OS_Start(void);
 
 #endif
